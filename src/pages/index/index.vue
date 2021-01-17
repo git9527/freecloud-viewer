@@ -114,15 +114,15 @@ export default {
   },
   methods: {
     getFrameWidth () {
-      const fullWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth
+      const fullWidth = uni.getSystemInfoSync().screenWidth
       return fullWidth * 0.9 + 'px'
     },
     getFrameHeight () {
-      const height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight
+      const height = uni.getSystemInfoSync().screenHeight
       return height * 0.8 + 'px'
     },
     getListHeight () {
-      const height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight
+      const height = uni.getSystemInfoSync().screenHeight
       return height - 200 + 'px'
     },
     formatSize (size) {
