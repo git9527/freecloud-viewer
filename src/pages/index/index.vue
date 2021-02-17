@@ -10,14 +10,14 @@
               <h3>
                 <span
                   v-for="(item, index) in pathStack"
-                  :key="item"
-                  @click="toPreviousFolder(index)">
-                  <span v-if="item === '/' || item === ''">
+                  :key="index"
+                  @click="enterFolder(item.id)">
+                  <span v-if="item.name">{{ item.name }}</span>
+                  <span v-else>
                     <i class="iconfont icon-home"></i>
                     首页
                   </span>
-                  <span v-else>{{ item }}</span>
-                  <span class="path-separator" v-if="item || item !== '/'"
+                  <span class="path-separator" v-if="index != pathStack.length - 1"
                     >>
                   </span>
                 </span>
@@ -30,13 +30,13 @@
                   <uni-th min-width="150" align="left">文件名</uni-th>
                   <uni-th width="100" align="center">添加时间</uni-th>
               </uni-tr>
-              <uni-tr v-for="(item,index) in files" :key="index">
+              <uni-tr v-for="(item, index) in files" :key="index">
                 <uni-td align="left">
                   <view class="uni-flex uni-row">
                     <span v-if="item.isFolder" class="flex-item iconfont file-icon icon-folder"></span>
                     <span v-else :class="['iconfont','file-icon', getFileType(item.name)]"></span>
                     <view class="flex-item">
-                      <a v-if="item.isFolder" class="folder-name" @click="enterFolder(item.name)">{{item.name}}</a>
+                      <a v-if="item.isFolder" class="folder-name" @click="enterFolder(item._id)">{{item.name}}</a>
                       <a v-else @click="fileClick(item, index)" class="file-name">{{item.name}}</a>
                     </view>
                   </view>
@@ -100,17 +100,9 @@ export default {
       showAudio: false
     }
   },
-  mounted () {
-    this.init()
-  },
-  watch: {
-    $route: {
-      handler () {
-        this.init()
-      },
-      // 深度观察监听
-      deep: true
-    }
+  onLoad (option) {
+    console.log('id is', option.id)
+    this.init(option.id)
   },
   methods: {
     getFrameWidth () {
@@ -131,52 +123,30 @@ export default {
     getFileType (name) {
       return 'icon-' + checkFileType(name)
     },
-    getCurrentFolder () {
-      let currentPath = this.$route.path
-      if (currentPath[currentPath.length - 1] === '/') {
-        currentPath = currentPath.slice(0, -1)
-      }
-      return currentPath
-    },
-    async init () {
+    async init (id) {
       this.loading = true
-      const currentPath = this.getCurrentFolder()
-      const [err, resp] = await getFilesByParent(currentPath)
+      const [err, resp] = await getFilesByParent(id)
       const body = resp.data
-      console.log('error', err, 'body', body)
+      console.debug('error', err, 'body', body)
       if (body.code === 0) {
         this.files = body.data.files
-        this.pathStack = currentPath.split('/')
+        this.pathStack = body.data.paths
         const siteInfo = body.data.siteInfo
         document.title = siteInfo.htmlTitle
         this.siteHeader = siteInfo.siteHeader
         Vue.use(uweb, siteInfo.cnzzId)
       } else {
         uni.showToast({
-          title: '111'
+          title: body.message
         })
       }
       this.loading = false
     },
-    enterFolder (name) {
-      const target = this.getCurrentFolder() + '/' + name
-      this.$router.push({
-        path: target
+    enterFolder (id) {
+      uni.navigateTo({
+        url: id ? '?id=' + id : ''
       })
-    },
-    toPreviousFolder (index) {
-      if (index + 1 !== this.pathStack.length) {
-        const stack = this.pathStack.slice(0, index + 1)
-        const targetUrl = stack.length === 1 ? '/' : stack.join('/')
-        console.log('target url', targetUrl)
-        this.$router.push({
-          path: targetUrl
-        })
-      } else {
-        uni.showToast({
-          title: '已在该目录'
-        })
-      }
+      this.init(id)
     },
     fileClick (file, index) {
       const fileName = file.name
