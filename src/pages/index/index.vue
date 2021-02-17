@@ -132,7 +132,9 @@ export default {
         this.files = body.data.files
         this.pathStack = body.data.paths
         const siteInfo = body.data.siteInfo
-        document.title = siteInfo.htmlTitle
+        uni.setNavigationBarTitle({
+          title: siteInfo.htmlTitle
+        })
         this.siteHeader = siteInfo.siteHeader
         Vue.use(uweb, siteInfo.cnzzId)
       } else {
@@ -143,10 +145,12 @@ export default {
       this.loading = false
     },
     enterFolder (id) {
-      uni.navigateTo({
-        url: id ? '?id=' + id : ''
+      uni.redirectTo({
+        url: id ? '/?id=' + id : '/',
+        success: () => {
+          this.init(id)
+        }
       })
-      this.init(id)
     },
     fileClick (file, index) {
       const fileName = file.name
