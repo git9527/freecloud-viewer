@@ -1,10 +1,10 @@
 import config from '../config.json'
 
-export function getFilesByParent (parent) {
+export function getFilesByParent (id) {
   return uni.request({
     url: config.remote,
     data: {
-      parent: parent
+      currentFolderId: id
     },
     method: 'POST'
   })
