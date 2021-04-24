@@ -60,29 +60,24 @@
            <video id="myVideo" :src="previewLink" controls autoplay show-mute-btn :style="{'width': getFrameWidth(), 'height': getFrameHeight()}" x5-playsinline="true" x5-video-player-type="h5-page"></video>
         </view>
       </uni-popup>
-      <a-player v-if="showAudio" autoplay :music="music" float repeat="repeat-one" class="audio-container"></a-player>
+      <uni-popup ref="audioPopup" class="video-container" @change="audioPopupChange">
+        <view>
+           <zaudio theme="theme1"/>
+        </view>
+      </uni-popup>
   </div>
 </template>
 
 <script>
 import { getFilesByParent } from '../../api/index.js'
 import { formatSize, checkFileType } from '../../utils/index.js'
-import APlayer from 'vue-aplayer'
+import zaudio from '@/components/uniapp-zaudio/zaudio'
 import Vue from 'vue'
 import uweb from 'vue-uweb'
 
 export default {
   components: {
-    APlayer
-  },
-  computed: {
-    music () {
-      return {
-        src: this.audioLink,
-        title: this.audioName,
-        artist: ' '
-      }
-    }
+    zaudio: zaudio
   },
   data () {
     return {
@@ -94,9 +89,7 @@ export default {
       previewLink: '',
       audioLink: '',
       audioName: '',
-      audioAction: {
-        method: 'pause'
-      },
+      audioPlay: false,
       showAudio: false
     }
   },
@@ -178,16 +171,24 @@ export default {
     },
     playVideo (playUrl, index) {
       this.previewLink = playUrl
-      this.showAudio = false
       this.$refs.videoPopup.open()
     },
     playAudio (file, index) {
-      this.showAudio = false
-      this.$nextTick(() => {
-        this.audioLink = file.link
-        this.audioName = file.name
-        this.showAudio = true
-      })
+      this.$refs.audioPopup.open()
+      this.$zaudio.setAudio([{
+        src: file.link,
+        title: file.name,
+        singer: '',
+        coverImgUrl: ''
+      }])
+      this.$zaudio.operate(0)
+    },
+    audioPopupChange (event) {
+      if (!event.show) {
+        this.$zaudio.setAudio([])
+        this.$zaudio.operate(0)
+        this.$zaudio.stop()
+      }
     }
   }
 }
