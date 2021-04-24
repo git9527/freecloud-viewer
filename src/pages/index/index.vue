@@ -36,8 +36,8 @@
                     <span v-if="item.isFolder" class="flex-item iconfont file-icon icon-folder"></span>
                     <span v-else :class="['iconfont','file-icon', getFileType(item.name)]"></span>
                     <view class="flex-item">
-                      <a v-if="item.isFolder" class="folder-name" @click="enterFolder(item._id)">{{item.name}}</a>
-                      <a v-else @click="fileClick(item, index)" class="file-name">{{item.name}}</a>
+                      <text v-if="item.isFolder" class="folder-name" @click="enterFolder(item._id)">{{item.name}}</text>
+                      <text v-else @click="fileClick(item, index)" class="file-name">{{item.name}}</text>
                     </view>
                   </view>
                 </uni-td>
@@ -72,8 +72,10 @@
 import { getFilesByParent } from '../../api/index.js'
 import { formatSize, checkFileType } from '../../utils/index.js'
 import zaudio from '@/components/uniapp-zaudio/zaudio'
+// #ifdef H5
 import Vue from 'vue'
 import uweb from 'vue-uweb'
+// #endif
 
 export default {
   components: {
@@ -129,7 +131,9 @@ export default {
           title: siteInfo.htmlTitle
         })
         this.siteHeader = siteInfo.siteHeader
+        // #ifdef H5
         Vue.use(uweb, siteInfo.cnzzId)
+        // #endif
       } else {
         uni.showToast({
           title: body.message
@@ -139,7 +143,7 @@ export default {
     },
     enterFolder (id) {
       uni.redirectTo({
-        url: id ? '/?id=' + id : '/',
+        url: id ? '/pages/index/index?id=' + id : '/pages/index/index',
         success: () => {
           this.init(id)
         }
@@ -195,6 +199,14 @@ export default {
 </script>
 
 <style>
+  .longtext{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .icon-home {
+    display: inline;
+  }
   .content {
     display: flex;
     flex-direction: column;
