@@ -57,7 +57,7 @@ export default {
 <style lang="scss">
   .uni-table-td {
     display: table-cell;
-    padding: 12px 10px;
+    padding: 11px 9px;
     // text-align: center;
     vertical-align: middle;
     border-bottom: 1px #ddd solid;

@@ -60,8 +60,9 @@
 
 		<template v-if="theme == 'theme1'">
 			<view class="top">
-				<view class="audio-control-wrapper"><image :src="renderData('coverImgUrl')" mode="aspectFill" class="cover" :class="{ on: !renderData('paused') }"></image></view>
-
+				<view class="audio-control-wrapper">
+          <image :src="renderData('coverImgUrl') || require('./static/default-cover.jpeg')" mode="aspectFill" class="cover" :class="{ on: !renderData('paused') }"></image>
+        </view>
 				<view>
 					<view class="title">{{ renderData('title') }}</view>
 					<view class="singer">{{ renderData('singer') }}</view>
