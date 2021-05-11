@@ -124,9 +124,10 @@ export default {
       const body = resp.data
       console.debug('error', err, 'body', body)
       if (body.code === 0) {
-        this.files = body.data.files
-        this.pathStack = body.data.paths
-        const siteInfo = body.data.siteInfo
+        const respData = body.data
+        this.files = respData.files
+        this.pathStack = respData.paths
+        const siteInfo = respData.siteInfo
         uni.setNavigationBarTitle({
           title: siteInfo.htmlTitle
         })
@@ -134,6 +135,10 @@ export default {
         // #ifdef H5
         Vue.use(uweb, siteInfo.cnzzId)
         // #endif
+        const targetFile = respData.targetFile
+        if (!targetFile.isFolder) {
+          this.fileClick(targetFile, 0)
+        }
       } else {
         uni.showToast({
           title: body.message

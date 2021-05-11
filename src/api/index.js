@@ -4,7 +4,7 @@ export function getFilesByParent (id) {
   return uni.request({
     url: config.remote,
     data: {
-      currentFolderId: id
+      id: id
     },
     method: 'POST'
   })
